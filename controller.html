@@ -17,13 +17,18 @@
           <input id="room" name="room" required minlength="3" maxlength="12" placeholder="例如: team123" />
         </div>
         <div class="row">
-          <label for="total">卡片總數</label>
-          <input id="total" name="total" type="number" min="5" step="1" required placeholder="例如 30" />
+          <label for="ballCount">一局要玩幾顆球</label>
+          <input id="ballCount" name="ballCount" type="number" min="1" step="1" required placeholder="例如 4" />
+        </div>
+        <div class="row">
+          <label for="colorCount">有幾種顏色的球</label>
+          <input id="colorCount" name="colorCount" type="number" min="1" max="6" step="1" required placeholder="例如 3" />
         </div>
         <fieldset class="row">
-          <legend>顏色模式</legend>
-          <label class="radio"><input type="radio" name="mode" value="2" checked /> 紅/藍</label>
-          <label class="radio"><input type="radio" name="mode" value="3" /> 紅/藍/綠</label>
+          <legend>請輸入球的顏色</legend>
+          <div id="colorInputs" class="color-inputs">
+            <!-- 動態生成的顏色輸入框 -->
+          </div>
         </fieldset>
         <div class="actions">
           <button type="submit" id="btn-start">建立並同步</button>
@@ -38,6 +43,7 @@
         <span id="progress">0 / 0</span>
         <button id="btn-prev" class="ghost" disabled>上一張</button>
         <button id="btn-next">下一張</button>
+        <button id="btn-ready" class="ready-btn">READY?</button>
         <button id="btn-config" class="ghost">重新設定</button>
         <button id="btn-reshuffle-play" class="ghost">重抽</button>
       </div>

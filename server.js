@@ -35,9 +35,9 @@ io.on('connection', (socket) => {
     socket.emit('joined');
   });
 
-  socket.on('state', ({ room, deck, idx }) => {
+  socket.on('state', ({ room, deck, idx, isReady, customColors }) => {
     if (!room) return;
-    io.to(room).emit('state', { deck, idx });
+    io.to(room).emit('state', { deck, idx, isReady, customColors });
   });
 });
 

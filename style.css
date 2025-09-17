@@ -9,8 +9,14 @@ form .row{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:cent
 input{width:100%;padding:8px 10px;border-radius:8px;border:1px solid #8ea0ae}
 fieldset.row{border:1px dashed rgba(255,255,255,.25);border-radius:10px;padding:10px 12px;text-align:left}
 .radio{display:inline-flex;align-items:center;gap:8px;margin-right:12px}
+.checkbox{display:inline-flex;align-items:center;gap:8px;margin-right:12px}
+.color-selection{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.color-inputs{display:flex;flex-direction:column;gap:8px}
+.color-input-row{display:grid;grid-template-columns:80px 1fr;gap:12px;align-items:center}
+.color-input-row input{min-width:200px}
 button{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 16px;cursor:pointer}
 button.ghost{background:transparent;border:1px solid rgba(255,255,255,.35)}
+button.ready-btn{background:#ff6b35;font-weight:bold;font-size:16px}
 button:disabled{opacity:.5;cursor:not-allowed}
 .actions{margin-top:10px;display:flex;gap:10px;justify-content:center}
 .hint{color:var(--muted);font-size:14px;margin-top:8px}
@@ -20,6 +26,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .color-red{background:#ff4d4f;color:#fff}
 .color-blue{background:#3f8cff;color:#fff}
 .color-green{background:#22c55e;color:#fff}
+.color-ready{background:#000000;color:#fff;font-size:72px;font-weight:bold}
 .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:8px 12px;border-radius:8px;display:none}
 .toast.show{display:block}
 

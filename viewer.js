@@ -11,18 +11,35 @@ const toast = document.getElementById('toast');
 
 let socket;
 let room='';
-let deck=[]; let idx=-1;
+let deck=[]; 
+let idx=-1;
+let isReady = false;
+let customColors = {};
 
 function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 1500); }
 
 function render(){
   cardEl.className = 'color-card';
-  if (idx>=0 && idx<deck.length){
-    const c = deck[idx];
-    cardEl.classList.add(COLORS[c].className);
-    cardEl.textContent = COLORS[c].label;
+  if (isReady) {
+    cardEl.style.backgroundColor = '#000000';
+    cardEl.style.color = '#ffffff';
+    cardEl.textContent = 'READY?';
+    progressEl.textContent = 'READY?';
+  } else if (idx>=0 && idx<deck.length){
+    const colorKey = deck[idx];
+    const colorInfo = customColors[colorKey];
+    if (colorInfo) {
+      cardEl.style.backgroundColor = colorInfo.bgColor;
+      cardEl.style.color = colorInfo.textColor;
+      cardEl.textContent = colorInfo.name;
+    }
     progressEl.textContent = `${idx+1} / ${deck.length}`;
-  } else { cardEl.textContent=''; progressEl.textContent=`0 / 0`; }
+  } else { 
+    cardEl.textContent=''; 
+    cardEl.style.backgroundColor = '';
+    cardEl.style.color = '';
+    progressEl.textContent=`0 / 0`; 
+  }
 }
 
 form.addEventListener('submit', e => {
@@ -32,7 +49,13 @@ form.addEventListener('submit', e => {
   socket = io(base, { path: '/ws/socket.io' });
   socket.emit('join', room);
   socket.on('joined', ()=>{ setup.classList.add('hidden'); player.classList.remove('hidden'); showToast(`已加入 ${room}`); });
-  socket.on('state', s => { deck = s.deck || []; idx = s.idx ?? -1; render(); });
+  socket.on('state', s => { 
+    deck = s.deck || []; 
+    idx = s.idx ?? -1; 
+    isReady = s.isReady || false;
+    customColors = s.customColors || {};
+    render(); 
+  });
   socket.on('error-msg', msg => showToast(msg));
 });
 
