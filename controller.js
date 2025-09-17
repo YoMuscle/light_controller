@@ -125,7 +125,7 @@ form.addEventListener('submit', e => {
   connect();
   socket.emit('join', room);
 
-  deck = makeDeck(ballCount, colorKeys);
+  deck = makeDeck(ballCount, colorKeys, customColors);
   idx = -1; // 初始狀態為 READY?
   isReady = true; // 遊戲開始時顯示 READY?
   setup.classList.add('hidden');
@@ -186,7 +186,7 @@ generateColorInputs(2);
 btnReshuffle.addEventListener('click', ()=>{
   if (!room) return; 
   const colorKeys = Object.keys(customColors);
-  deck = makeDeck(ballCount, colorKeys); 
+  deck = makeDeck(ballCount, colorKeys, customColors); 
   idx = -1; // 重抽後回到初始 READY? 狀態
   isReady = true;
   render(); 
@@ -230,7 +230,7 @@ btnReady.addEventListener('click', ()=>{
 btnReshufflePlay?.addEventListener('click', ()=>{
   if (!room) return; 
   const colorKeys = Object.keys(customColors);
-  deck = makeDeck(ballCount, colorKeys); 
+  deck = makeDeck(ballCount, colorKeys, customColors); 
   idx = -1; // 重抽後回到初始 READY? 狀態
   isReady = true;
   render(); 

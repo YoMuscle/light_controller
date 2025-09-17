@@ -49,7 +49,7 @@ function validateDeck(deck, colorKeys) {
   };
 }
 
-export function makeDeck(ballCount, colorKeys){
+export function makeDeck(ballCount, colorKeys, customColors = null){
   if (!colorKeys || colorKeys.length === 0) return [];
   
   const colorCount = colorKeys.length;
@@ -72,13 +72,66 @@ export function makeDeck(ballCount, colorKeys){
     return deck;
   }
   
-  // 嘗試生成符合規則的牌組
-  let bestDeck = null;
-  let bestScore = -1;
+  // 生成牌組
+  const deck = [];
   
-  for (let attempt = 0; attempt < 50; attempt++) {
-    const deck = [];
+  // 特殊處理：只有3種顏色時使用特定比例
+  if (colorCount === 3 && customColors) {
+    // 檢查是否包含紅色、藍色、綠色
+    const hasRed = colorKeys.some(key => {
+      const colorInfo = customColors[key];
+      return colorInfo && (colorInfo.name.toLowerCase().includes('red') || colorInfo.name.toLowerCase().includes('紅色'));
+    });
+    const hasBlue = colorKeys.some(key => {
+      const colorInfo = customColors[key];
+      return colorInfo && (colorInfo.name.toLowerCase().includes('blue') || colorInfo.name.toLowerCase().includes('藍色'));
+    });
+    const hasGreen = colorKeys.some(key => {
+      const colorInfo = customColors[key];
+      return colorInfo && (colorInfo.name.toLowerCase().includes('green') || colorInfo.name.toLowerCase().includes('綠色'));
+    });
     
+    if (hasRed && hasBlue && hasGreen) {
+      // 使用特殊比例：紅色4次，綠色1-2次，其餘藍色
+      const redCount = 4;
+      const greenCount = Math.floor(Math.random() * 2) + 1; // 1-2次
+      const blueCount = ballCount - redCount - greenCount;
+      
+      // 找到對應的顏色鍵
+      const redKey = colorKeys.find(key => {
+        const colorInfo = customColors[key];
+        return colorInfo && (colorInfo.name.toLowerCase().includes('red') || colorInfo.name.toLowerCase().includes('紅色'));
+      });
+      const blueKey = colorKeys.find(key => {
+        const colorInfo = customColors[key];
+        return colorInfo && (colorInfo.name.toLowerCase().includes('blue') || colorInfo.name.toLowerCase().includes('藍色'));
+      });
+      const greenKey = colorKeys.find(key => {
+        const colorInfo = customColors[key];
+        return colorInfo && (colorInfo.name.toLowerCase().includes('green') || colorInfo.name.toLowerCase().includes('綠色'));
+      });
+      
+      // 分配顏色
+      for(let i = 0; i < redCount; i++) deck.push(redKey);
+      for(let i = 0; i < greenCount; i++) deck.push(greenKey);
+      for(let i = 0; i < blueCount; i++) deck.push(blueKey);
+      
+      console.log(`3種顏色特殊比例：紅色${redCount}次，綠色${greenCount}次，藍色${blueCount}次`);
+    } else {
+      // 不是標準的紅藍綠組合，使用一般規則
+      for(let i = 0; i < colorCount; i++) {
+        deck.push(colorKeys[i]);
+      }
+      const remainingBalls = ballCount - colorCount;
+      if (remainingBalls > 0) {
+        for(let i = 0; i < remainingBalls; i++) {
+          const randomColor = colorKeys[Math.floor(Math.random() * colorCount)];
+          deck.push(randomColor);
+        }
+      }
+    }
+  } else {
+    // 其他情況使用一般規則
     // 首先為每種顏色分配一個球
     for(let i = 0; i < colorCount; i++) {
       deck.push(colorKeys[i]);
@@ -93,65 +146,69 @@ export function makeDeck(ballCount, colorKeys){
         deck.push(randomColor);
       }
     }
-    
-    // 洗牌
-    shuffleInPlace(deck);
-    
+  }
+  
+  // 洗牌
+  shuffleInPlace(deck);
+  
+  // 只有當顏色數量 >= 4 時才檢查相鄰顏色重複
+  if (colorCount >= 4) {
     // 嘗試修復相鄰的相同顏色
-    for (let i = 1; i < deck.length; i++) {
-      if (deck[i] === deck[i-1]) {
-        // 嘗試與後面的不同顏色交換
-        let swapped = false;
-        for(let j = i + 1; j < deck.length; j++) {
-          if (deck[j] !== deck[i]) {
-            [deck[i], deck[j]] = [deck[j], deck[i]];
-            swapped = true;
-            break;
-          }
-        }
-        
-        // 如果沒找到，嘗試與前面的不同顏色交換
-        if (!swapped) {
-          for(let j = 0; j < i - 1; j++) {
+    let attempts = 0;
+    const maxAttempts = 50;
+    
+    while (attempts < maxAttempts) {
+      let hasAdjacent = false;
+      
+      // 檢查是否有相鄰的相同顏色
+      for(let i = 1; i < deck.length; i++) {
+        if (deck[i] === deck[i-1]) {
+          hasAdjacent = true;
+          
+          // 嘗試與後面的不同顏色交換
+          let swapped = false;
+          for(let j = i + 1; j < deck.length; j++) {
             if (deck[j] !== deck[i]) {
               [deck[i], deck[j]] = [deck[j], deck[i]];
               swapped = true;
               break;
             }
           }
+          
+          // 如果沒找到，嘗試與前面的不同顏色交換
+          if (!swapped) {
+            for(let j = 0; j < i - 1; j++) {
+              if (deck[j] !== deck[i]) {
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+                swapped = true;
+                break;
+              }
+            }
+          }
+          
+          // 如果還是沒找到合適的交換，重新洗牌
+          if (!swapped) {
+            shuffleInPlace(deck);
+            break;
+          }
         }
       }
+      
+      if (!hasAdjacent) {
+        break; // 沒有相鄰的相同顏色，完成
+      }
+      
+      attempts++;
     }
     
-    // 驗證牌組
-    const validation = validateDeck(deck, colorKeys);
-    
-    if (validation.isValid) {
-      return deck; // 找到完美的牌組
+    if (attempts >= maxAttempts) {
+      console.warn('無法完全避免相鄰的相同顏色，但確保每種顏色都至少出現一次');
     }
-    
-    // 計算分數（所有顏色都出現 + 沒有相鄰相同顏色）
-    const score = (validation.allColorsPresent ? 1 : 0) + (validation.noAdjacent ? 1 : 0);
-    if (score > bestScore) {
-      bestScore = score;
-      bestDeck = [...deck];
-    }
+  } else {
+    // 顏色數量 < 4 時，允許相鄰顏色重複，只確保每種顏色都至少出現一次
+    console.log(`顏色數量(${colorCount})少於4個，允許相鄰顏色重複`);
   }
   
-  // 如果沒找到完美的牌組，返回最好的嘗試
-  if (bestDeck) {
-    const validation = validateDeck(bestDeck, colorKeys);
-    if (!validation.isValid) {
-      console.warn('無法生成完全符合規則的牌組，但已盡力優化');
-    }
-    return bestDeck;
-  }
-  
-  // 最後的備用方案
-  const deck = [];
-  for(let i = 0; i < ballCount; i++) {
-    deck.push(colorKeys[i % colorCount]);
-  }
   return deck;
 }
 
