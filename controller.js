@@ -58,7 +58,7 @@ function render(){
     cardEl.textContent = 'READY?';
     progressEl.textContent = 'READY?';
     btnNext.disabled = false; // READY? 狀態下啟用下一張按鈕
-    btnReady.disabled = false; // READY? 狀態下也可以按 READY? 按鈕
+    btnReady.disabled = true; // READY? 狀態下禁用 READY? 按鈕
   } else if (idx>=0 && idx<deck.length){
     const colorKey = deck[idx];
     const colorInfo = customColors[colorKey];
@@ -68,7 +68,7 @@ function render(){
       cardEl.textContent = colorInfo.name;
     }
     progressEl.textContent = `${idx+1} / ${deck.length}`;
-    btnNext.disabled = idx >= deck.length - 1; // 最後一個顏色時禁用下一張
+    btnNext.disabled = true; // 顯示顏色時禁用下一張按鈕
     btnReady.disabled = false; // 顯示顏色時可以按 READY?
   } else {
     cardEl.textContent = '';
@@ -138,7 +138,7 @@ form.addEventListener('submit', e => {
 // 根據顏色名稱生成對應的顏色
 function getColorByName(colorName) {
   const colorMap = {
-    '紅色': '#ff4d4f', 'red': '#ff4d4f',
+    '紅色': '#e60012', 'red': '#e60012', // Adobe 紅色
     '藍色': '#3f8cff', 'blue': '#3f8cff',
     '綠色': '#22c55e', 'green': '#22c55e',
     '黃色': '#f59e0b', 'yellow': '#f59e0b',
@@ -166,7 +166,7 @@ function getColorByName(colorName) {
   
   // 如果沒有匹配，返回隨機顏色
   const randomColors = [
-    '#ff4d4f', '#3f8cff', '#22c55e', '#ff6b35', '#8b5cf6', '#f59e0b',
+    '#e60012', '#3f8cff', '#22c55e', '#ff6b35', '#8b5cf6', '#f59e0b',
     '#ef4444', '#06b6d4', '#84cc16', '#f97316', '#a855f7', '#eab308'
   ];
   return randomColors[Math.floor(Math.random() * randomColors.length)];
@@ -202,8 +202,8 @@ btnPrev.addEventListener('click', ()=>{
 });
 
 btnNext.addEventListener('click', ()=>{ 
+  // 只有在 READY? 狀態時才能按下一張
   if (isReady) {
-    // 從 READY? 狀態進入下一個顏色
     isReady = false;
     if (idx < 0) {
       // 如果還沒有顯示任何顏色，顯示第一個
@@ -212,24 +212,16 @@ btnNext.addEventListener('click', ()=>{
       // 如果已經顯示過顏色，顯示下一個
       idx++;
     }
-  } else if (idx < deck.length - 1) {
-    // 顯示下一個顏色
-    idx++;
+    render(); 
+    emitState(); 
   }
-  render(); 
-  emitState(); 
 });
 
 // READY? 按鈕
 btnReady.addEventListener('click', ()=>{
-  if (!room) return;
-  if (idx >= 0) {
-    // 在顯示顏色時，切換到 READY? 狀態
-    isReady = true;
-  } else {
-    // 在 READY? 狀態時，切換回顏色顯示
-    isReady = false;
-  }
+  if (!room || idx < 0) return; // 只有在顯示顏色時才能按 READY?
+  // 在顯示顏色時，切換到 READY? 狀態
+  isReady = true;
   render();
   emitState();
 });
