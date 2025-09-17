@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game07 觀眾端</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <h1>Game07 觀眾端</h1>
+    <section class="card setup" id="setup">
+      <form id="join-form">
+        <div class="row">
+          <label for="room">房號</label>
+          <input id="room" name="room" required minlength="3" maxlength="12" placeholder="例如: team123" />
+        </div>
+        <div class="actions">
+          <button type="submit">加入</button>
+        </div>
+      </form>
+    </section>
+    <section class="player hidden" id="player">
+      <div class="status"><span id="progress">0 / 0</span></div>
+      <div id="card" class="color-card" tabindex="0"></div>
+    </section>
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script type="module" src="viewer.js"></script>
+</body>
+</html>
+
+

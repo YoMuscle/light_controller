@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game07 控制端</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <h1>Game07 控制端</h1>
+
+    <section class="card setup" id="setup">
+      <form id="form">
+        <div class="row">
+          <label for="room">房號</label>
+          <input id="room" name="room" required minlength="3" maxlength="12" placeholder="例如: team123" />
+        </div>
+        <div class="row">
+          <label for="total">卡片總數</label>
+          <input id="total" name="total" type="number" min="5" step="1" required placeholder="例如 30" />
+        </div>
+        <fieldset class="row">
+          <legend>顏色模式</legend>
+          <label class="radio"><input type="radio" name="mode" value="2" checked /> 紅/藍</label>
+          <label class="radio"><input type="radio" name="mode" value="3" /> 紅/藍/綠</label>
+        </fieldset>
+        <div class="actions">
+          <button type="submit" id="btn-start">建立並同步</button>
+          <button type="button" id="btn-reshuffle" class="ghost" disabled>重抽</button>
+        </div>
+      </form>
+      <p class="hint">觀眾端請開啟 viewer.html 並輸入相同房號</p>
+    </section>
+
+    <section class="player hidden" id="player">
+      <div class="status">
+        <span id="progress">0 / 0</span>
+        <button id="btn-prev" class="ghost" disabled>上一張</button>
+        <button id="btn-next">下一張</button>
+        <button id="btn-config" class="ghost">重新設定</button>
+        <button id="btn-reshuffle-play" class="ghost">重抽</button>
+      </div>
+      <div id="card" class="color-card" tabindex="0"></div>
+    </section>
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script type="module" src="controller.js"></script>
+</body>
+</html>
+
+
